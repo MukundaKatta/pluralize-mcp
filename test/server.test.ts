@@ -1,7 +1,13 @@
 import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 
-import { pluralizeWord, singularizeWord, isPlural } from '../src/server.js';
+import {
+  pluralizeWord,
+  singularizeWord,
+  isPlural,
+  requireWord,
+  optionalCount,
+} from '../src/server.js';
 
 test('pluralizes regular nouns', () => {
   assert.equal(pluralizeWord('cat'), 'cats');
@@ -38,4 +44,27 @@ test('isPlural identifies plurals', () => {
   assert.equal(isPlural('cats'), true);
   assert.equal(isPlural('mice'), true);
   assert.equal(isPlural('cat'), false);
+});
+
+test('requireWord accepts non-empty strings', () => {
+  assert.equal(requireWord('cat'), 'cat');
+});
+
+test('requireWord rejects non-strings and empty strings', () => {
+  assert.throws(() => requireWord(undefined), /must be a string/);
+  assert.throws(() => requireWord(123), /must be a string/);
+  assert.throws(() => requireWord(''), /must not be empty/);
+});
+
+test('optionalCount passes through finite numbers and undefined', () => {
+  assert.equal(optionalCount(undefined), undefined);
+  assert.equal(optionalCount(null), undefined);
+  assert.equal(optionalCount(5), 5);
+  assert.equal(optionalCount(0), 0);
+});
+
+test('optionalCount rejects non-finite and non-numbers', () => {
+  assert.throws(() => optionalCount('2'), /finite number/);
+  assert.throws(() => optionalCount(NaN), /finite number/);
+  assert.throws(() => optionalCount(Infinity), /finite number/);
 });
